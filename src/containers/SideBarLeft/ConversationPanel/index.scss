@@ -1,0 +1,201 @@
+.sidebar-left_items {
+    padding: 0;
+    min-height: calc(100vh - 157px);
+    overflow: hidden;
+}
+
+.sidebar-left {
+    float: left;
+    width: calc(50% - 230px);
+    height: 100vh;
+    background-color: #2f3136;
+}
+
+.sidebar-left-items {
+    float: right;
+}
+
+.sidebar-search {
+    margin: 15px 15px 15px 0px;
+    background: #36393f !important;
+    width: 240px;
+    border-radius: 5px;
+    font-family: "Noto Sans" !important;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.sidebar-search input:focus {
+    padding: 10px 40px 10px 20px;
+    box-shadow: 0 0 0 4px #36393f, 0 0 0 5px #5e6ca5;
+}
+
+.sidebar-search_input {
+    width: 75%;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    color: #f6f6f7;
+    font-family: "Noto Sans" !important;
+    padding: 10px 40px 10px 20px;
+    font-size: 13px;
+}
+
+.sidebar-search_icon {
+    position: absolute;
+    margin: 12px 0px 14px -28px;
+    pointer-events: none;
+    color: #aaa;
+}
+
+.sidebar_left-item .sidebar_left-item_avatar {
+    display: inline-block;
+    width: 50px;
+    border-radius: 5px;
+}
+
+.sidebar_left-item {
+    display: block;
+    width: 228px;
+    height: 50px;
+    background: #2f3136;
+    margin: 7px 1px;
+    padding: 5px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.sidebar-left_item__selected {
+    background: #454950;
+    box-shadow: 0 0 0px 1px #555;
+    outline: 0;
+}
+
+.sidebar_left-item:hover {
+    background: #36393f;
+}
+
+.sidebar_left-item:focus{
+    background: #36393f;
+    box-shadow: 0 0 0px 1px #555;
+    outline: 0;
+}
+
+.sidebar_left-item:active {
+    background: #36393f;
+    box-shadow: 0 0 0px 1px #555;
+    outline: 0;
+}
+
+.sidebar_left-item:active .sidebar_left-item_avatar {
+    border-radius: 5px;
+}
+
+.sidebar_left-item_contain {
+    float: right;
+    width: 170px;
+    padding-top: 3px;
+    padding-right: 2px;
+}
+
+.sidebar_left-item_username {
+    font-size: 13px;
+    color: #dcdcdc;
+}
+
+.sidebar_left-item_online {
+    padding: 3px;
+    background: #78e0a2;
+    border: 2px solid #2f3136;
+    position: absolute;
+    margin-top: -4px;
+    left: 51px;
+    border-radius: 50%;
+}
+
+.sidebar_left-item_last-message {
+    font-size: 13px;
+    color: #9c9c9c;
+}
+
+.sidebar_left-item_contain__right-contain {
+    float: right;
+    margin-top: 7px;
+}
+.sidebar_left-item_contain__right-contain___new-message {
+    display: inline-block;
+    // padding: 1px;
+    font-size: 14px;
+    background: #474d5a;
+    color: #a79cff;
+    border-radius: 20px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.sidebar-left_navbar-panel {
+    padding: 0px 10px;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    width: auto;
+    height: 60px;
+    border-top: 1px dashed #000;
+}
+
+.sidebar-left_navbar-panel li {
+    padding: 15px 0px;
+}
+
+.sidebar-left_navbar-panel__avatar {
+    float: left;
+    width: 30px;
+    border-radius: 5px;
+}
+
+.sidebar-left_navbar-panel__settings {
+    padding: 6px;
+    // margin-right: 10px;
+    border-radius: 50%;
+    background-color: #2f3136;
+    color: #b7b7b7;
+    text-decoration: none !important;
+    outline: 0 !important;
+}
+
+.sidebar-left_navbar-panel__settings:hover {
+    color: #fff;
+    background-color: #494f5a;
+}
+.sidebar-left_navbar-panel__settings:focus {
+    color: #fff;
+    background-color: #494f5a;
+    box-shadow: 0 0 0 1px #fff9fa;
+}
+
+.sidebar-left_navbar-panel__nickname {
+    float: left;
+    margin-top: 6px;
+    margin-left: 5px;
+    font-size: 13px;
+    color: #aaa;
+    cursor: auto;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.sidebar-search[contenteditable=true]:empty:after {
+    content: "Поиск";
+    display: block; /* For Firefox */
+}
