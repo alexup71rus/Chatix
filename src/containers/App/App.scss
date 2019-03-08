@@ -1,5 +1,6 @@
 #root {
     height: 100vh;
+    overflow: hidden;
 }
 
 .unselectable {
@@ -21,4 +22,41 @@ li {
 .checked {
     color: #999999;
     background: #90e8b82e;
+}
+
+.chat-show {
+    animation: chat-show .4s normal forwards ease-in-out;
+}
+
+.chat-hide {
+    animation: chat-hide .3s normal forwards ease-in-out;
+}
+
+@keyframes chat-hide {
+    from {
+        opacity: 1;
+        transform: scale(1, 1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.6, 0.6);
+    }
+}
+
+@keyframes chat-show {
+    from {
+        opacity: 0;
+        transform: scale(0.8, 0.8);
+    }
+    20% {
+        opacity: 0;
+        transform: scale(0.8, 0.8);
+    }
+    60% {
+        opacity: 1;
+        transform: scale(1.01, 1.01);
+    }
+    to {
+        transform: scale(1, 1);
+    }
 }

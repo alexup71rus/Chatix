@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+// import { combineReducers } from 'redux';
 
 const reducers = (state = [], action) => {
     let newState = [...state];
@@ -114,14 +114,9 @@ const reducers = (state = [], action) => {
                     });
                 }
             } else if (action.response.type == "separator_no-messages") {
-                newState[0].conversations["id"+action.response.id].messages.unshift({
-                    type: "separator_no-messages"
-                });
+                newState[0].conversations["id"+action.response.id].messages.unshift({ type: "separator_no-messages" });
             } else if (action.response.type == "separator_date") { // не доделано
-                newState[0].conversations["id"+action.response.id].messages.unshift({
-                    type: "separator_date",
-                    date: "..."
-                });
+                newState[0].conversations["id"+action.response.id].messages.unshift({ type: "separator_date", date: "..." });
             } else if (action.response.type == "replace_title") {
                 newState[0].conversations["id"+action.response.response.data.id].title = action.response.response.data.title;
             } else if (action.response.type == "lazy_load") {
@@ -141,10 +136,30 @@ const reducers = (state = [], action) => {
                             message: {text: obj.message.text, forward: obj.message.forward, attach: obj.message.attach},
                         }
                     });
+                    newMessages[newMessages.length - 1].type = "first_load_message";
                     newState[0].conversations["id"+action.response.id].messages.unshift(...newMessages);
                 }
             }
+
+            var result = { 'conversations': {} };
+            Object.keys(newState[0].conversations).sort(function (a, b) {
+                const lenA = newState[0].conversations[a].messages.length - 1;
+                const lenB = newState[0].conversations[b].messages.length - 1;
+                return newState[0].conversations[b].messages[lenB].id - newState[0].conversations[a].messages[lenA].id;
+            }).forEach(function (v) { result.conversations[v] = newState[0].conversations[v]; });
+
+            newState[0].conversations = result.conversations;
+
             return [...newState];
+
+        case 'CONVERSATIONS_SEARCH': // текст поля поиска
+            newState[0].conversations_search = action.text;
+            return [...newState];
+
+        case 'MODAL': // отметить все сообщения в чате как прочитанные
+            newState[0].modal = action.modal;
+            return [...newState];
+
 
         default:
             return state;

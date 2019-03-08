@@ -154,13 +154,14 @@
 }
 
 .sidebar-left_navbar-panel__settings {
-    padding: 6px;
-    // margin-right: 10px;
+    padding: 9px 8px 9px 9px;
     border-radius: 50%;
     background-color: #2f3136;
     color: #b7b7b7;
     text-decoration: none !important;
-    outline: 0 !important;
+    outline: 0;
+    border: none;
+    font-size: 16px;
 }
 
 .sidebar-left_navbar-panel__settings:hover {

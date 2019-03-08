@@ -1,12 +1,13 @@
 import React, { Component, PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { DateSeparator, SeparatorNoMessages, Message } from '../../../components/message';
+import { Separator, DateSeparator, SeparatorNoMessages, Message } from '../../../components/message';
 import { HeaderDialogContainer } from '../../../components/header-dialog-container';
 import { Scrollbars } from 'react-custom-scrollbars'; // Кастомный скролл
 import axios from 'axios-jsonp-pro';
 import TextAreaMessage from '../../../components/textarea';
 import { markAsRead, setChatInfo, setMyProfileInfo, setSelectChatItem, setUserOnline, setMessages } from '../../../actions';
 import './index.scss';
+import { isArray } from 'util';
 
 class DialogContainer extends PureComponent {
     constructor(props) {
@@ -171,7 +172,9 @@ class DialogContainer extends PureComponent {
         const conversations = this.props.globalState[0].conversations['id'+this.state.id];
         if (this.state.id) {
             return <div className="dialog-left">
-                <HeaderDialogContainer />
+                <HeaderDialogContainer
+                    globalState={this.props.globalState}
+                />
                 <Scrollbars
                     style={{height: "calc(100vh - 180px)" }}
                     autoHide ref="scrollbars"
@@ -179,17 +182,19 @@ class DialogContainer extends PureComponent {
                     // onScrollStop={()=>this.handleScrollStop()} для показа стрелки вниз а мобилках
                     >
                     <div className="dialog-left_container" id="dialog-left_container">
-                        {
-                            conversations
-                            ? conversations.messages.map(obj => {
-                                    if (obj.type == "first_load_message" || obj.type == "load_message" || obj.type == "push_message") {
-                                        return <Message key={obj.id} obj={obj} />
-                                    } else if (obj.type == "separator_no-messages") {
-                                        return <SeparatorNoMessages key={obj.type} name={conversations.title} />
-                                    }
-                                })
-                            : <div>Вы пишите пользователю, которого нет в ваших контактах</div>
-                        }
+                    {
+                        conversations
+                        ? conversations.messages.map(obj => {
+                                if (obj.type == "load_message" || obj.type == "push_message") {
+                                    return <Message key={obj.id} obj={obj} />
+                                } else if (obj.type == "first_load_message") {
+                                    return <div key={obj.id}><Message obj={obj} /><Separator /></div>
+                                } else if (obj.type == "separator_no-messages") {
+                                    return <SeparatorNoMessages key={obj.type} name={conversations.title} />
+                                }
+                            })
+                        : <div>Вы пишите пользователю, которого нет в ваших контактах</div>
+                    }
                     </div>
                 </Scrollbars>
                 <TextAreaMessage globalState={this.globalState} setMessages={this.props.setMessages} watchOnlineStatus={this.watchOnlineStatus} setUserOnline={this.setUserOnline} ownerClass={this} />

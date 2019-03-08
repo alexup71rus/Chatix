@@ -60,3 +60,24 @@ export const setMessages = (response) => { // обновить отображе�
         response: response
     };
 }
+
+export const messagesSearch = (text) => { // текст поискового запроса
+    return {
+        type: "MESSAGES_SEARCH",
+        text: text,
+    };
+}
+
+export const conversationsSearch = (text) => { // текст поискового запроса
+    return {
+        type: "CONVERSATIONS_SEARCH",
+        text: text,
+    };
+}
+
+export const modal = (typeModal) => { // обновить отображение сообщений
+    return {
+        type: "MODAL",
+        modal: typeModal,
+    };
+}

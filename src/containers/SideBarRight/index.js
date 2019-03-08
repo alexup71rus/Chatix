@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import { SettingsPage } from '../Settings/';
 import { LoginPage, RegisterPage } from '../Auth/';
 import DialogContainer from './DialogContainer/';
 
@@ -19,13 +18,14 @@ const SideBarRight = (props) => {
                 return <div></div>;
             }
         } } />
-        <Route exact path="/id" render={(ev) => {
-            return <DialogContainer
-                loc={ev}
-                watchOnlineStatus={watchOnlineStatus}
-            />
+        <Route exact path="/*" render={(ev) => {
+            return <div>
+                <DialogContainer
+                    loc={ev}
+                    watchOnlineStatus={watchOnlineStatus}
+                />
+            </div>
         }} />
-        <Route exact path="/settings" render={ (ev)=>SettingsPage(ev) } />
     </div>;
 }
 

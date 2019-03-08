@@ -19,7 +19,7 @@
 
 .dialog-header_online {
     display: inline-block;
-    margin-top: 6px;
+    margin-top: 24px;
     padding: 4px;
     background: #78e0a2;
     border: 3px solid #2f3136;
@@ -145,15 +145,6 @@ time {
     padding: 7px;
 }
 
-.CodeMirror-simplescroll-horizontal, .CodeMirror-simplescroll-vertical {
-    background: #212121 !important;
-}
-
-.CodeMirror-simplescroll-horizontal div, .CodeMirror-simplescroll-vertical div {
-    background: #ababab;
-    border: 1px solid #474d5a;
-}
-
 .textarea-container_items {
     position: absolute;
     right: calc(50% - 480px);
@@ -185,9 +176,9 @@ time {
 }
 
 .emoji-mart {
-    position: fixed;
-    bottom: 75px;
-    left: calc(50% + 120px);
+    position: absolute;
+    bottom: 36px;
+    left: calc(50% - 330px);
 }
 
 .message_text__pretty-message {
@@ -198,9 +189,36 @@ time {
 }
 
 .separator-item {
+    padding: 10px 10px;
+    text-align: center;
+}
+
+.separator-item_end {
     background-color: #2f3136;
     color: #9097a5;
     padding: 10px 10px;
     text-align: center;
 }
 
+.dialog-header_left-container__id-dialog {
+    color: #95989e;
+    font-size: 13px;
+}
+
+.dialog-header_left-container__title-dialog {
+    cursor: pointer;
+}
+
+.dialog-header_left-container__title-dialog:hover, .dialog-header_left-container__title-dialog:active {
+    color: #fff;
+}
+
+.skin-tones, .emoji::before {
+    display: none !important;
+}
+
+.emoji-picker {
+    position: fixed;
+    left: calc(50% + 190px);
+    top: calc(100vh - 420px);
+}

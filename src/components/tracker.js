@@ -14,7 +14,7 @@ export class WatchOnlineStatus {
               setUserOnline({ data: [{ id: id, time: 0, }] });
             });
             this.state['offline_key'] = window.cometApi.subscription(`user_status_${id}.offline`, function(event) {
-              setUserOnline({ data: [{ id: id, time: -1, }] });
+              setUserOnline({ data: [{ id: id, time: Math.floor(Date.now() / 1000), }] });
             });
             return this.state;
         }

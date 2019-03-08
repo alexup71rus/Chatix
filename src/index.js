@@ -9,6 +9,7 @@ import * as serviceWorker from './serviceWorker';
 import configureStore from './store/configureStore';
 
 const initialState = [{
+    modal: "",
     me: { // Информация о пользователе
         info: window.localStorage.userInfo ? JSON.parse(window.localStorage.userInfo) : {},
         hash: window.localStorage.hash,
@@ -21,6 +22,8 @@ const initialState = [{
         send_keys: ['enter'],
         selected_user: 0, // Выбранный чат с пользователем
     },
+    conversations_search: "",
+    messages_search: "",
     conversation: 0,
     conversations: {}
 }];

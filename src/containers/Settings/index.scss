@@ -1,0 +1,67 @@
+.settings {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: calc(100% + 30px);
+    height: calc(100% + 30px);
+    transform: translate(-50%, -50%);
+    z-index: 8;
+}
+
+.fullscreen-show {
+    animation: settings-show .3s normal forwards ease-in-out;
+}
+
+.fullscreen-hide {
+    pointer-events: none;
+    animation: settings-hide .3s normal forwards ease-in-out;
+}
+
+.settings_sidebar-left {
+    float: left;
+    width: calc(50% - 230px);
+    height: 100%;
+    background-color: #2f3136;
+}
+
+.settings_sidebar-right {
+    float: right;
+    width: calc(50% + 229px);
+    height: 100vh;
+    background-color: #36393f;
+}
+
+.settings_sidebar_button-back {
+    float: right;
+    margin-top: 50px;
+}
+
+.fullscreen-hide-non-animation {
+    pointer-events: none;
+    opacity: 0;
+}
+
+@keyframes settings-hide {
+    from {
+        opacity: 1;
+        transform: scale(1, 1) translate(-50%, -50%);
+    }
+    to {
+        opacity: 0;
+        transform: scale(1.2, 1.2) translate(-50%, -50%);
+    }
+}
+
+@keyframes settings-show {
+    from {
+        opacity: 0;
+        transform: scale(1.2, 1.2) translate(-50%, -50%);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(0.995, 0.995) translate(-50%, -50%);
+    }
+    to {
+        transform: scale(1, 1) translate(-50%, -50%);
+    }
+}

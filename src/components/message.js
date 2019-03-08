@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
-import Emojis, {createEmojisComponent, EmojiSprite, supportsWebP} from 'react-emoji-component' 
+import { emojify } from 'react-emojione';
+
+export const Separator = () => {
+    return <div className="separator-item unselected"></div>;
+}
 
 export const DateSeparator = () => {
-    return <div className="sidebar-item unselected">
-        
-    </div>;
+    return <div className="separator-item_date unselected"><b>---</b></div>;
 }
 
 export const SeparatorNoMessages = ({ name }) => {
     name = name.slice(-1) == " " ? name.slice(0, -1) : name;
-    return <div className="separator-item unselected">Это начало истории ваших личных сообщений с <b>{name}</b>.</div>;
+    return <div className="separator-item_end unselected">Это начало истории ваших личных сообщений с <b>{name}</b>.</div>;
 }
 
 export const Message = ({ obj }) => {
@@ -19,6 +21,7 @@ export const Message = ({ obj }) => {
     const readstate = obj.readstate;
     const unread = readstate ? 'message-item_unread' : '';
     const unixtime = new Date(date * 1000).toLocaleString();
+
     return <div className={"message-item " + unread}>
         <img className="message-item_avatar" src="https://vk.com/images/camera_200.png?ava=1" alt=""/>
         <span className="message-item_online"></span>
@@ -29,10 +32,8 @@ export const Message = ({ obj }) => {
             </div>
             <br/>
             <div className="message-item_message">
-                <pre className="message_text__pretty-message"><Emojis size={24}>{text}</Emojis></pre>
+                <pre className="message_text__pretty-message">{emojify(text, { useEmoticon : true, emojiType: "emojione", convertAscii: true, convertUnicode: true, convertShortnames: true, style:{height: 22, } }) }</pre>
             </div>
-            {/* <div className="sidebar-item_contain__right-contain"></div>
-            <span className="sidebar-item_contain__right-contain___new-message">1</span> */}
         </div>
     </div>;
 }

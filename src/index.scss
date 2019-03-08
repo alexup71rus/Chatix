@@ -11,7 +11,7 @@ body {
   color: aliceblue;
 }
 
-input, button, textarea { outline: none !important; font-family: "Noto Sans" !important; font-size: 13px; }
+input, button, textarea { outline: none; font-family: "Noto Sans"; font-size: 13px; }
 
 .unselected-text {
   -moz-user-select: none; /* Mozilla Firefox */

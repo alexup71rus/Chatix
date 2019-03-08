@@ -3,9 +3,7 @@ import React, { Component } from 'react';
 import Textarea from 'react-textarea-autosize';
 import { Scrollbars } from 'react-custom-scrollbars'; // Кастомный скролл
 import axios from 'axios-jsonp-pro';
-
-import 'emoji-mart/css/emoji-mart.css';
-import { Picker } from 'emoji-mart';
+import EmojiPicker from 'emoji-picker-react';
 
 class TextAreaMessage extends Component {
     constructor(props) {
@@ -13,43 +11,45 @@ class TextAreaMessage extends Component {
         this.state = {
             emojibar: false,
             key: false,
-            text: "",
             enterKey: false,
             shiftKey: false,
+            selectionStart: 0,
+            selectionEnd: 0
         };
         this.addEmoji = this.addEmoji.bind(this);
     }
 
-    componentDidMount() {
-    }
-    
-    componentDidUpdate() {
-        this.textarea.focus();
+    componentWillUnmount() {
     }
 
-    addEmoji = (e) => {
-        if (e.unified.length <= 5){
-          let emojiPic = String.fromCodePoint(`0x${e.unified}`)
-          this.setState({
-            text: this.state.text + `:${e.id}:`,
-            key: !this.state.key,
-          })
-        } else {
-          let sym = e.unified.split('-')
-          let codesArray = []
-          sym.forEach(el => codesArray.push('0x' + el))
-          let emojiPic = String.fromCodePoint(...codesArray)
-          this.setState({
-            text: this.state.text + `:${e.id}:`,
-            key: !this.state.key,
-          })
+    componentDidMount() {
+    }
+
+    componentDidUpdate() {
+        // this.textarea.focus();
+    }
+
+    addEmoji = (e, emojiName) => {
+        if (emojiName.name){
+            const textareaStrParts = [
+                `${this.textarea.value.substring(0, this.state.selectionStart)}`,
+                `:${emojiName.name}:`,
+                `${this.textarea.value.substring(this.state.selectionEnd, this.length)}`,
+            ];
+            this.textarea.value = textareaStrParts.join('');
+            this.textarea.focus();
+            this.textarea.selectionEnd = this.state.selectionEnd + emojiName.name.length + 2;
+            this.setState({
+                selectionStart: this.textarea.selectionEnd,
+                selectionEnd: this.textarea.selectionEnd,
+            })
         }
     }
-    
+
     render() {
         const { globalState, setUserOnline, watchOnlineStatus, setMessages, ownerClass } = this.props;
         return <div className="textarea-container" onKeyDown={ev=>{
-            const value = ev.target.value.trim();
+            const value = ev.target.value ? ev.target.value.trim() : ev.target.value;
             const validText = value.replace(/\s+/g,'');
             if (ev.keyCode == 13 && this.state.shiftKey == false && validText.length > 0) {
                 this.setState({
@@ -110,14 +110,23 @@ class TextAreaMessage extends Component {
                 <Textarea
                     inputRef={obj=>(this.textarea = obj)}
                     useCacheForDOMMeasurements
-                    value={this.state.text}
                     onChange={(ev) => {
                         this.setState({text: ev.target.value});
                         if (this.state.enterKey == true && this.state.shiftKey == false) {
-                            this.setState({
-                                text: "",
-                            });
+                            this.textarea.value = "";
                         }
+                    }}
+                    onClick={(ev) => {
+                        this.setState({
+                            selectionStart: ev.target.selectionStart,
+                            selectionEnd: ev.target.selectionEnd,
+                        });
+                    }}
+                    onKeyUp={(ev) => {
+                        this.setState({
+                            selectionStart: ev.target.selectionStart,
+                            selectionEnd: ev.target.selectionEnd,
+                        });
                     }}
                     className="textarea"
                     maxLength="500"
@@ -127,14 +136,9 @@ class TextAreaMessage extends Component {
             </Scrollbars>
             
             <div className="textarea-container_items">
-                <Picker
-                set='emojione'
-                onSelect={this.addEmoji}
-                showPreview={false}
-                emojiTooltip={true}
-                color="#4d50a9"
-                style={{display: this.state.emojibar ? "block" : "none"}}
-                />
+                {
+                    this.state.emojibar ? <EmojiPicker onEmojiClick={this.addEmoji} disableDiversityPicker /> : null
+                }
                 <button className="textarea-container_item__smile" onClick={ev=>{
                     this.setState({emojibar: !this.state.emojibar});
                 }}><i className="fas fa-grin textarea-container_item__smile-icon"></i></button>

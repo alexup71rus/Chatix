@@ -4,9 +4,10 @@ import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom
 import axios from 'axios-jsonp-pro';
 import './App.scss';
 import { WatchOnlineStatus } from '../../components/tracker';
+import SettingsPage from '../Settings/';
 import SideBarLeft from '../SideBarLeft/';
 import SideBarRight from '../SideBarRight/';
-import { setConversations, setUserOnline, setMessages } from '../../actions';
+import { setConversations, setUserOnline, setMessages, modal } from '../../actions';
 
 class App extends React.Component {
   constructor(props) {
@@ -29,12 +30,14 @@ class App extends React.Component {
           setConversations(response);
         })
         .then(()=>{
+          if (Object.keys(globalState[0].conversations).length > 0) {
+            watchOnlineStatus.checkOnlineStatus(globalState, setUserOnline);
+          }
           const location = window.location.hash;
           if (location && globalState[0].conversations["id"+location.slice(1)]) {
             const id = location.slice(1);
             const fetch = globalState[0].conversations["id"+id].messages.length || 0;
             if (globalState[0].conversations["id"+id] && fetch) {
-              watchOnlineStatus.checkOnlineStatus(globalState, setUserOnline);
               axios.post(`https://khodyr.ru/chatix/backend/`, { // получает все сообщения в открытом чате
                 request: "GET_MESSAGES",
                 id: location.slice(1),
@@ -60,7 +63,10 @@ class App extends React.Component {
         })
         .then(()=>{
           setInterval(()=>{
-            watchOnlineStatus.checkOnlineStatus(globalState, setUserOnline);
+            const id = window.location.hash.slice(1);
+            if (globalState[0].conversations["id"+id] && globalState[0].conversations["id"+id].messages.length) {
+              watchOnlineStatus.checkOnlineStatus(globalState, setUserOnline);
+            }
           }, 150000);
         });
       }
@@ -75,6 +81,7 @@ class App extends React.Component {
   }
 
   render () {
+    const chatClass = this.props.globalState[0].modal === "settings" ? "chat-hide" : "chat-show";
     return (
       <Router>
         <div>
@@ -87,14 +94,18 @@ class App extends React.Component {
               }
             }} />
           }
-          <Route exact path="/*" render={() => <div>
-            <SideBarLeft
-              globalState={this.props.globalState}
-            />
-            <SideBarRight
-              watchOnlineStatus={this.watchOnlineStatus}
-            />
-          </div>} />
+          <Route exact path="/*" render={(ev) => <div>
+            <SettingsPage route_path={ev} />
+            <div className={`chat ${chatClass}`}>
+              <SideBarLeft
+                globalState={this.props.globalState}
+              />
+              <SideBarRight
+                watchOnlineStatus={this.watchOnlineStatus}
+              />
+            </div>
+          </div>
+          } />
         </div>
       </Router>
     )
@@ -109,6 +120,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    modal: (typeModal) => dispatch(modal(typeModal)),
     setConversations: (response) => dispatch(setConversations(response)),
     setUserOnline: (response) => dispatch(setUserOnline(response)),
     setMessages: (response) => dispatch(setMessages(response)),

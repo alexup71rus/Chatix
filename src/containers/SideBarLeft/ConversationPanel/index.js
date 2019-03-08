@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import { SidebarSearch } from '../../../components/search';
 import { DialogSidebarItem } from '../../../components/sidebar-item';
 import { Scrollbars } from 'react-custom-scrollbars';
-import { setConversations, setChatInfo, setMyProfileInfo } from '../../../actions';
+import { conversationsSearch, modal, setConversations, setChatInfo, setMyProfileInfo } from '../../../actions';
 import './index.scss';
 
 class ConversationPanel extends PureComponent {
@@ -13,10 +13,6 @@ class ConversationPanel extends PureComponent {
         this.state = {
             isMounted: false,
         };
-        this.globalState = props.globalState;
-        this.setChatInfo = props.setChatInfo;
-        this.setConversations = props.setConversations;
-        this.setMyProfileInfo = props.setMyProfileInfo;
     }
 
     componentDidMount() {
@@ -28,11 +24,13 @@ class ConversationPanel extends PureComponent {
     }
 
     render() {
-        const globalState = this.props.globalState;
+        const { globalState, setChatInfo, setConversations, setMyProfileInfo, conversationsSearch } = this.props;
+        let conversations = globalState[0].conversations;
+        conversations = Object.keys(conversations).filter(id => conversations[id].title.includes(globalState[0].conversations_search));
         return <nav>
-            <SidebarSearch />
+            <SidebarSearch conversations={conversations} conversationsSearch={conversationsSearch} />
             <Scrollbars className="sidebar-left_items" autoHide>
-                {Object.keys(globalState[0].conversations).map(id => (
+                {conversations.map(id => (
                     <DialogSidebarItem
                     key={globalState[0].conversations[id].id}
                     conversation={globalState[0].conversations[id]}
@@ -42,10 +40,10 @@ class ConversationPanel extends PureComponent {
             <div className="sidebar-left_navbar-panel" title="Information about me">
                 <li>
                     <img className="sidebar-left_navbar-panel__avatar" src="https://vk.com/images/camera_200.png?ava=1" alt="avatar"/>
-                    <span className="sidebar-left_navbar-panel__nickname" title={`id${this.props.globalState[0].me.id}`}>id# {this.props.globalState[0].me.id}</span>
+                    <span className="sidebar-left_navbar-panel__nickname" title={`id${this.props.globalState[0].me.id}`}>{`${this.props.globalState[0].me.info.first_name} ${this.props.globalState[0].me.info.last_name}`}</span>
                 </li>
                 <li>
-                    <Link to="/settings" className="fas fa-cog sidebar-left_navbar-panel__settings" title="settings"></Link>
+                    <button onClick={()=>this.props.modal("settings")} className="fas fa-cog sidebar-left_navbar-panel__settings" title="Настрйоки"></button>
                 </li>
             </div>
         </nav>
@@ -63,6 +61,8 @@ const mapDispatchToProps = (dispatch) => {
         setConversations: (response) => dispatch(setConversations(response)),
         setChatInfo: (info) => dispatch(setChatInfo(info)),
         setMyProfileInfo: (info) => dispatch(setMyProfileInfo(info)),
+        modal: (typeModal) => dispatch(modal(typeModal)),
+        conversationsSearch: (text) => dispatch(conversationsSearch(text)),
     }
 }
   
