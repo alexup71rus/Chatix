@@ -1,13 +1,21 @@
 import React from 'react';
 
-export const SidebarSearch = (props) => {
-    const { conversations, conversationsSearch, routeLocation } = props;
+let uid = "";
+export const SidebarSearch = ({ conversations, conversationsSearch, routeLocation }) => {
     return <div className="sidebar-search">
     <input
     className="sidebar-search_input"
     placeholder="Поиск собеседников"
-    onChange={ev=>{
-        if (ev.target.value.slice(0,1) == "#" && ev.target.value.length > 1 && Number.isInteger(+ev.target.value.slice(1))) {
+    onKeyUp={ev=>{
+        if (ev.target.value.slice(0,1) == "#" && ev.target.value.length == 1 && uid === "") {
+            if (routeLocation.location.hash) {
+                uid = routeLocation.location.hash;
+            }
+        } else if (ev.target.value.length === 0 && uid) {
+            routeLocation.history.push(`/id${uid}`);
+            uid = "";
+        }
+        if (ev.target.value.slice(0,1) == "#" && ev.target.value.length >= 1 && Number.isInteger(+ev.target.value.slice(1))) {
             routeLocation.history.push(`/id#${ev.target.value.slice(1)}`);
         } else {
             conversationsSearch(ev.target.value);

@@ -1,10 +1,9 @@
 import React, { Component, PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import { SidebarSearch } from '../../../components/search';
 import { DialogSidebarItem } from '../../../components/sidebar-item';
 import { Scrollbars } from 'react-custom-scrollbars';
-import { conversationsSearch, modal, setConversations, setChatInfo, setMyProfileInfo } from '../../../actions';
+import { conversationsSearch, modal, setConversations, setMyProfileInfo } from '../../../actions';
 import './index.scss';
 
 class ConversationPanel extends PureComponent {
@@ -24,9 +23,13 @@ class ConversationPanel extends PureComponent {
     }
 
     render() {
-        const { routeLocation, globalState, setChatInfo, setConversations, setMyProfileInfo, conversationsSearch } = this.props;
+        const { routeLocation, globalState, setConversations, setMyProfileInfo, conversationsSearch } = this.props;
         let conversations = globalState[0].conversations;
-        conversations = Object.keys(conversations).filter(id => conversations[id].title.includes(globalState[0].conversations_search));
+        if (globalState[0].conversations_search.slice(0,1) !== "#") {
+            conversations = Object.keys(conversations).filter(id => conversations[id].title.includes(globalState[0].conversations_search));
+        } else {
+            conversations = Object.keys(conversations)
+        }
         return <nav>
             <SidebarSearch conversations={conversations} conversationsSearch={conversationsSearch} routeLocation={routeLocation} />
             <Scrollbars className="sidebar-left_items" autoHide>
@@ -34,7 +37,7 @@ class ConversationPanel extends PureComponent {
                     <DialogSidebarItem
                     key={globalState[0].conversations[id].id}
                     conversation={globalState[0].conversations[id]}
-                    isSelected={ this.props.globalState[0].conversation == id.slice(2) ? true : false } />
+                    isSelected={ this.props.globalState[0].conversation.id == id.slice(2) ? true : false } />
                 ))}
             </Scrollbars>
             <div className="sidebar-left_navbar-panel" title="Information about me">
@@ -59,7 +62,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         setConversations: (response) => dispatch(setConversations(response)),
-        setChatInfo: (info) => dispatch(setChatInfo(info)),
         setMyProfileInfo: (info) => dispatch(setMyProfileInfo(info)),
         modal: (typeModal) => dispatch(modal(typeModal)),
         conversationsSearch: (text) => dispatch(conversationsSearch(text)),

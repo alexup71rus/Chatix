@@ -7,7 +7,7 @@ import { WatchOnlineStatus } from '../../components/tracker';
 import SettingsPage from '../Settings/';
 import SideBarLeft from '../SideBarLeft/';
 import SideBarRight from '../SideBarRight/';
-import { setConversations, setUserOnline, setMessages, modal } from '../../actions';
+import { setSelectChatItem, setConversations, setUserOnline, setMessages, modal } from '../../actions';
 
 class App extends React.Component {
   constructor(props) {
@@ -17,7 +17,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const { globalState, setUserOnline, setConversations, setMessages } = this.props;
+    const { globalState, setSelectChatItem, setUserOnline, setConversations, setMessages } = this.props;
     const watchOnlineStatus = this.watchOnlineStatus;
     window.cometApi.onAuthSuccess(function(){
       if (globalState[0].me.hash) {
@@ -38,6 +38,7 @@ class App extends React.Component {
             const id = location.slice(1);
             const fetch = globalState[0].conversations["id"+id].messages.length || 0;
             if (globalState[0].conversations["id"+id] && fetch) {
+              setSelectChatItem(id);
               axios.post(`https://khodyr.ru/chatix/backend/`, { // получает все сообщения в открытом чате
                 request: "GET_MESSAGES",
                 id: location.slice(1),
@@ -112,6 +113,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     modal: (typeModal) => dispatch(modal(typeModal)),
+    setSelectChatItem: (id) => dispatch(setSelectChatItem(id)),
     setConversations: (response) => dispatch(setConversations(response)),
     setUserOnline: (response) => dispatch(setUserOnline(response)),
     setMessages: (response) => dispatch(setMessages(response)),

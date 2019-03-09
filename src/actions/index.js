@@ -17,10 +17,10 @@ export const setMyProfileInfo = (info) => { // обновить отображе
     };
 }
 
-export const setChatInfo = (info) => { // обновить отображение информации о чате
+export const removeConversations = (id) => { // обновить отображение информации о чате
     return {
-        type: "SET_CHAT_INFO",
-        info: info
+        type: "REMOVE_CONVERSATIONS",
+        id: id
     };
 }
 
@@ -47,10 +47,12 @@ export const markAsRead = (id, errUC, errUT) => { // отметить сообщ
     };
 }
 
-export const setSelectChatItem = (id) => { // выделить выбранный чат
+export const setSelectChatItem = (id, title, lastVisit) => { // выделить выбранный чат
     return {
         type: "SET_SELECT_CHAT_ITEM",
-        chat_id: id
+        chat_id: id,
+        title: title,
+        last_visit: lastVisit
     };
 }
 

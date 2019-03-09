@@ -24,7 +24,11 @@ const initialState = [{
     },
     conversations_search: "",
     messages_search: "",
-    conversation: 0,
+    conversation: {
+        id: 0,
+        title: "Заголовок",
+        last_visit: "...",
+    },
     conversations: {}
 }];
 

@@ -13,12 +13,15 @@ const reducers = (state = [], action) => {
             };
             return [...newState];
 
-        case 'SET_CHAT_INFO': // обновить отображение информации о чате
+        case 'REMOVE_CONVERSATIONS': // удалить отображение диалогов
+            if (action.id && newState[0].conversations["id"+action.id]) {
+                delete newState[0].conversations["id"+action.id];
+            }
             return [...newState];
 
         case 'SET_CONVERSATIONS': // обновить отображение диалогов
             action.response.data.forEach(element => {
-                const lm = JSON.parse(element.last_message);
+                const lm = element.last_message && element.last_message != "..." ? JSON.parse(element.last_message) : null;
                 newState[0].conversations["id"+element.to_user_id] = {
                     key: element.id,
                     id: element.to_user_id,
@@ -26,7 +29,7 @@ const reducers = (state = [], action) => {
                     last_visit: +element.last_visit,
                     read_time: +element.read_time,
                     unread_count: +element.unread_count,
-                    messages: [{
+                    messages: [lm ? {
                         type: "first_load_message",
                         avatar: lm.avatar,
                         date: lm.date,
@@ -35,7 +38,7 @@ const reducers = (state = [], action) => {
                         id: lm.id,
                         last_name: lm.last_name,
                         message: {text: lm.message.text, forward: lm.message.forward, attach: lm.message.attach},
-                    }]
+                    } : null]
                 };
             });
             return [...newState];
@@ -47,7 +50,14 @@ const reducers = (state = [], action) => {
             return [...newState];
 
         case 'SET_SELECT_CHAT_ITEM': // выделить выбранный чат
-            newState[0].conversation = action.chat_id           
+            newState[0].conversation.id = action.chat_id || 0;
+            if (newState[0].conversations[`id${action.chat_id}`]) {
+                newState[0].conversation.title = action.title || newState[0].conversations[`id${action.chat_id}`].title;    
+                newState[0].conversation.last_visit = action.last_visit || newState[0].conversations[`id${action.chat_id}`].last_visit;    
+            } else {
+                newState[0].conversation.title = action.title || "Заголовок";    
+                newState[0].conversation.last_visit = action.last_visit || -1;    
+            }
             return [...newState];
 
         case 'MARK_AS_READ': // отметить все сообщения в чате как прочитанные

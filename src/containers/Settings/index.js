@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { modal, setChatInfo, setMyProfileInfo } from '../../actions';
+import { modal, setMyProfileInfo } from '../../actions';
 import './index.scss';
 
 class SettingsPage extends PureComponent {
@@ -46,7 +46,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        setChatInfo: (info) => dispatch(setChatInfo(info)),
         setMyProfileInfo: (info) => dispatch(setMyProfileInfo(info)),
         modal:(typeModal) => {return dispatch(modal(typeModal))}
     }

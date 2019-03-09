@@ -19,7 +19,7 @@ export const DialogSidebarItem = ({conversation, isSelected}) => {
             }</b></span>
             <br/>
             <span className="sidebar_left-item_last-message">{
-                conversation.messages
+                conversation.messages && conversation.messages[conversation.messages.length - 1]
                 ? conversation.messages[conversation.messages.length - 1].message.text.length > 23
                     ? conversation.messages[conversation.messages.length - 1].message.text.slice(0, 20) + "..."
                     : conversation.messages[conversation.messages.length - 1].message.text

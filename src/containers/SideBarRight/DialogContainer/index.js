@@ -5,31 +5,31 @@ import { HeaderDialogContainer } from '../../../components/header-dialog-contain
 import { Scrollbars } from 'react-custom-scrollbars'; // Кастомный скролл
 import axios from 'axios-jsonp-pro';
 import TextAreaMessage from '../../../components/textarea';
-import { markAsRead, setChatInfo, setMyProfileInfo, setSelectChatItem, setUserOnline, setMessages } from '../../../actions';
+import { markAsRead, setMyProfileInfo, setConversations, setSelectChatItem, setUserOnline, setMessages } from '../../../actions';
 import './index.scss';
-import { isArray } from 'util';
 
 class DialogContainer extends PureComponent {
     constructor(props) {
         super(props);
-        this.state = {
-            isMount: false, // инициализировано
-            isStart: false, // получены первые сообщения
-            isSend: false, // было отправлено сообщение от моего имени
-            id: '',
-            secondId: '',
-        };
         this.loc = props.loc;
         this.globalState = props.globalState;
         this.setUserOnline = props.setUserOnline;
         this.watchOnlineStatus = props.watchOnlineStatus;
-        this.setChatInfo = props.setChatInfo;
         this.setMessages = props.setMessages;
         this.markAsRead = props.markAsRead;
         this.setSelectChatItem = props.setSelectChatItem;
         this.setMyProfileInfo = props.setMyProfileInfo;
         this.handleScrollBottom = this.handleScrollBottom.bind(this);
         this.read = this.read.bind(this);
+        this.state = {
+            isMount: false, // инициализировано
+            isStart: false, // получены первые сообщения
+            isSend: false, // было отправлено сообщение от моего имени
+            id: '',
+            secondId: '',
+            timerId: '',
+            isReadyToChat: false, // пользователь существует в базе и не забанил 
+        };
     }
 
     componentWillUnmount() {
@@ -46,6 +46,7 @@ class DialogContainer extends PureComponent {
                 hash: hash,
                 fetch: fetch,
                 fetch_end: fetch_end,
+                getterConv: [],
             })
             .then(response=>{
                 if (!response.data.length) { // если старых сообщений больше нет и нет уже добавленного значка о том, что больше нечего грузить, то выводить этот значок
@@ -96,8 +97,8 @@ class DialogContainer extends PureComponent {
         }
         this.unlisten = this.loc.history.listen((location, action) => { // слушаю измнение id в адресной строке
             const id = location.hash ? location.hash.slice(1) : "";
-            this.setSelectChatItem(id);
             if(id && this.globalState[0].conversations["id"+id]) {
+                this.setSelectChatItem(id);
                 if (this.globalState[0].conversations["id"+id].messages.length <= 1 && location.hash != this.state.id) {
                     this.getMessages(id, this.globalState[0].me.hash, this.globalState[0].conversations["id"+id].messages.length, 20, true); // Получаю все сообщения при открытии диалога
                 } else if (this.refs.scrollbars) {
@@ -106,6 +107,31 @@ class DialogContainer extends PureComponent {
                 if (this.globalState[0].conversations["id"+id].unread_count > 0) { // отметить сообщения в чате как прочитанные
                     this.read(id);
                 }
+                this.setState({ isReadyToChat: true });
+            } else if (location.hash.length > 1 && !globalState[0].conversations["id"+location.hash.slice(1)]) {
+                this.setSelectChatItem(location.hash.slice(1), "Загрузка...", "...");
+                this.setState({ isReadyToChat: false });
+                if (this.state.timerId) {
+                    clearTimeout(this.state.timerId);
+                }
+                this.setState({ timerId: setTimeout(() => {
+                    axios.post(`https://khodyr.ru/chatix/backend/`, {
+                        request: "GET_USERS_INFO",
+                        id: location.hash.slice(1),
+                        hash: this.globalState[0].me.hash
+                    })
+                    .then(response=>{
+                        if (globalState[0].conversation.title === "Загрузка...") {
+                            if (response.data.error == 2) {
+                                this.setSelectChatItem(location.hash.slice(1), "Пользователь не найен", "...");
+                            } else if (!response.data.error) {
+                                this.setSelectChatItem(response.data.id, response.data.first_name+" "+response.data.last_name, response.data.last_visit);
+                                this.setState({ isReadyToChat: true });
+                            }
+                        }
+                    });
+                }, 1000) });
+                
             }
             if(location.hash) {
                 this.setState({ id: location.hash.slice(1) });
@@ -138,12 +164,11 @@ class DialogContainer extends PureComponent {
                 this.setState({ secondId: this.state.id });
             } else if (this.state.isMount && !this.state.isStart && this.props.globalState[0].conversations['id'+ this.state.id ] && this.props.globalState[0].conversations['id'+ this.state.id ].messages.length > 5) {
                 this.refs.scrollbars.scrollToBottom();
-                this.setState({ secondId: this.state.id });
-                this.setState({isStart : true});
+                this.setState({ secondId: this.state.id, isStart : true, isReadyToChat : this.props.globalState[0].conversations['id'+ this.globalState[0].conversation.id] ? true : false });
             }
             if (this.state.isSend) {
                 this.refs.scrollbars.scrollToBottom();
-                this.setState({isSend: false});
+                this.setState({ isSend: false, isReadyToChat : this.props.globalState[0].conversations['id'+ this.globalState[0].conversation.id] ? true : false });
             }
         }
     }
@@ -197,7 +222,9 @@ class DialogContainer extends PureComponent {
                     }
                     </div>
                 </Scrollbars>
-                <TextAreaMessage globalState={this.globalState} setMessages={this.props.setMessages} watchOnlineStatus={this.watchOnlineStatus} setUserOnline={this.setUserOnline} ownerClass={this} />
+                {
+                    this.state.isReadyToChat ? <TextAreaMessage globalState={this.globalState} setMessages={this.props.setMessages} watchOnlineStatus={this.watchOnlineStatus} setUserOnline={this.setUserOnline} ownerClass={this} /> : null
+                }
             </div>
         } else {
             return <div className="dialog-left">
@@ -216,11 +243,11 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
       markAsRead: (id, errUC, errUT) => dispatch(markAsRead(id, errUC, errUT)),
-      setChatInfo: (info) => dispatch(setChatInfo(info)),
       setMyProfileInfo: (info) => dispatch(setMyProfileInfo(info)),
-      setSelectChatItem: (id) => dispatch(setSelectChatItem(id)),
+      setSelectChatItem: (id, title, lastVisit) => dispatch(setSelectChatItem(id, title, lastVisit)),
       setUserOnline: (response) => dispatch(setUserOnline(response)),
       setMessages: (response) => dispatch(setMessages(response)),
+      setConversations: (res) => dispatch(setConversations(res)),
     }
 }
   
