@@ -18,7 +18,7 @@ const SideBarRight = (props) => {
                 return <div></div>;
             }
         } } />
-        <Route exact path="/*" render={(ev) => {
+        <Route exact path="/id" render={(ev) => {
             return <div>
                 <DialogContainer
                     loc={ev}

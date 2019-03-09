@@ -7,7 +7,7 @@ const SideBarLeft = (props) => {
     const { globalState } = props;
     return <div className="sidebar-left"><div className="sidebar-left-items">
         <Route exact path="/auth" render={ (ev)=>AuthSidebar(ev, globalState) } />
-        <Route exact path="/*" render={ (ev)=><ConversationPanel />} />
+        <Route exact path="/id" render={ (ev)=><ConversationPanel routeLocation={ev} />} />
     </div></div>;
 }
 

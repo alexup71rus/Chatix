@@ -1,14 +1,17 @@
-import React, { Component } from 'react';
-
+import React from 'react';
 
 export const SidebarSearch = (props) => {
-    const { conversations, conversationsSearch } = props;
+    const { conversations, conversationsSearch, routeLocation } = props;
     return <div className="sidebar-search">
     <input
     className="sidebar-search_input"
     placeholder="Поиск собеседников"
     onChange={ev=>{
-        conversationsSearch(ev.target.value);
+        if (ev.target.value.slice(0,1) == "#" && ev.target.value.length > 1 && Number.isInteger(+ev.target.value.slice(1))) {
+            routeLocation.history.push(`/id#${ev.target.value.slice(1)}`);
+        } else {
+            conversationsSearch(ev.target.value);
+        }
     }} />
         <i className="fas sidebar-search_icon fa-search"></i>
     </div>;

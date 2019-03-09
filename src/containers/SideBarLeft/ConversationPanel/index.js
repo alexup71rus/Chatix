@@ -24,11 +24,11 @@ class ConversationPanel extends PureComponent {
     }
 
     render() {
-        const { globalState, setChatInfo, setConversations, setMyProfileInfo, conversationsSearch } = this.props;
+        const { routeLocation, globalState, setChatInfo, setConversations, setMyProfileInfo, conversationsSearch } = this.props;
         let conversations = globalState[0].conversations;
         conversations = Object.keys(conversations).filter(id => conversations[id].title.includes(globalState[0].conversations_search));
         return <nav>
-            <SidebarSearch conversations={conversations} conversationsSearch={conversationsSearch} />
+            <SidebarSearch conversations={conversations} conversationsSearch={conversationsSearch} routeLocation={routeLocation} />
             <Scrollbars className="sidebar-left_items" autoHide>
                 {conversations.map(id => (
                     <DialogSidebarItem
