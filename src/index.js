@@ -26,7 +26,7 @@ const initialState = [{
     messages_search: "",
     conversation: {
         id: 0,
-        title: "Заголовок",
+        title: "Загрузка",
         last_visit: "...",
     },
     conversations: {}

@@ -8,7 +8,7 @@ require_once './functions.helpers.php';
 require_once './bd.php';
 require_once './api.bd.php';
 
-$_db = mysqli_connect("app.comet-server.ru", " ВАШ ID РАЗРАБОТЧИКА ", " ВАШ HASH РАЗРАБОТЧИКА ", "CometQL_v1");
+$_db = mysqli_connect("app.comet-server.ru", "2450", "zYhjBtKeTXOlCItOsioRTLeLUXaFPPwj90WZIh5TFiJbGUsgJPJoddmnp2fBZNnz", "CometQL_v1");
 
 $_POST = json_decode(file_get_contents('php://input'), true);
 
@@ -116,7 +116,12 @@ switch ($_POST['request']) {
     break;
 
     case "GET_USERS_INFO": // получить информацию о пользователях по id
-        echo json_encode([ error => 0, message => "ok" ]);
+        if (strlen($_POST['id']) < 1) {
+            echo json_encode([ error => 4, message => "invalid `id` param" ]);
+            break;
+        }
+        $response = getUserInfo($_db, $_POST['id']);
+        echo json_encode($response, JSON_UNESCAPED_UNICODE);
     break;
     
     case "COUNT_NEW_MESSAGES_SUM": // количество непрочитанных сообщений

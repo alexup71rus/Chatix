@@ -8,9 +8,8 @@ function findMeForHash ($db, $hash) { //
 }
 
 function auth ($login, $pass) { global $db;
-    $queryFind = mysqli_fetch_assoc(mysqli_query($db, 'SELECT `hash`,`id`,`first_name`,`last_name`,`status`,`storage`,`avatar`,`conversations`,`advanced_settings` FROM `users` WHERE `login`="'.$login.'" AND `password`="'.$pass.'" '));
+    $queryFind = mysqli_fetch_assoc(mysqli_query($db, 'SELECT `hash`,`id`,`first_name`,`last_name`,`status`,`storage`,`avatar`,`advanced_settings` FROM `users` WHERE `login`="'.$login.'" AND `password`="'.$pass.'" '));
     if ($queryFind) {
-        updateOnlineStatus($queryFind['hash'], false);
         return [error=> 0, data=> $queryFind ];
     } else {
         return [ error => 5, message => "Неверный логин или пароль" ];
@@ -25,7 +24,6 @@ function register ($name, $mail, $login, $pass, $hash) { global $db;
     $queryAdd = mysqli_query($db, "INSERT INTO `users` (`id`, `mail`, `login`, `password`, `avatar`, `status`, `first_name`, `last_name`, `last_visit`, `conversations`, `storage`, `advanced_settings`, `hash`) VALUES (NULL, '$mail', '$login', '$pass', '', '', '$name', '', '', '', '', '', '$hash');");
     if ($queryAdd) {
         mysqli_query($db,"INSERT INTO `users_relations` (`user_id`, `to_user_id`, `type`) VALUES ('".$queryFind['id']."', '0', '0');");
-        updateOnlineStatus($hash, false);
         return [ error => 0, message => mysqli_insert_id($db) ];
     } else {
         return [ error => 6, message => "Ошибка при добавлении в базу" ];
@@ -109,5 +107,23 @@ function markAsRead ($id, $hash) { global $db;
         return [ error => 2, message => "Cannot mark as read" ];
     } else {
         return [ error => 1, message => "Invalid `hash`" ];
+    }
+}
+
+function getUserInfo ($_db, $id) { global $db;
+    if ($id) {
+        $result = mysqli_fetch_assoc(mysqli_query($db, "SELECT `id`,`avatar`,`first_name`,`last_name` FROM `users` where (id = ".$id.") limit 1 "));
+        $_result = mysqli_fetch_assoc(mysqli_query($_db, "SELECT * FROM users_time WHERE id IN( $id ); "));
+        if($result && $_result) {
+            return [
+                id=>$result['id'],
+                first_name=>$result['first_name'],
+                last_name=>$result['last_name'],
+                last_visit=>$_result['time'],
+            ];
+        }
+        return [ error => 2, message => "Cannot find user" ];
+    } else {
+        return [ error => 1, message => "Invalid `id`" ];
     }
 }

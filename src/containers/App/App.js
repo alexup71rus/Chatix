@@ -46,7 +46,6 @@ class App extends React.Component {
                 fetch: fetch,
               })
               .then(response=>{
-                console.log(response);
                 if (!response.data.length) { // если старых сообщений больше нет и нет уже добавленного значка о том, что больше нечего грузить, то выводить этот значок
                   setMessages({
                     type: "separator_no-messages",

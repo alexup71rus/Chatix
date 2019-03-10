@@ -151,7 +151,11 @@ const reducers = (state = [], action) => {
                 }
             }
 
-            var result = { 'conversations': {} };
+            // фильтр по актуальным диалогам (избранное всегда наверху)
+            let result = { 'conversations': {} };
+            result.conversations['id'+newState[0].me.id] = {
+                id: newState[0].me.id, title: "Избранное", last_visit: 0, unread_time: 0, unread_count: 0, messages: []
+            }
             Object.keys(newState[0].conversations).sort(function (a, b) {
                 const lenA = newState[0].conversations[a].messages.length - 1;
                 const lenB = newState[0].conversations[b].messages.length - 1;
