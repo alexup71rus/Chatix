@@ -86,6 +86,15 @@ class App extends React.Component {
     return (
       <Router>
         <div>
+        {
+            this.props.globalState[0].me.hash
+            ? <Route exact path="/" render={() => (<Redirect to="/id#"/>)} />
+            : <Route exact path="/*" render={(ev) => {
+              if (ev.location.hash != "#login" || ev.location.hash != "#register") {
+                return <Redirect to="/auth#login" />;
+              }
+            }} />
+          }
           <Route exact path="/*" render={(ev) => <div>
             <SettingsPage route_path={ev} />
             <div className={`chat ${chatClass}`}>

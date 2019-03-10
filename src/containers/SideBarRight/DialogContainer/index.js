@@ -21,6 +21,7 @@ class DialogContainer extends PureComponent {
         this.setMyProfileInfo = props.setMyProfileInfo;
         this.handleScrollBottom = this.handleScrollBottom.bind(this);
         this.read = this.read.bind(this);
+        this.loadUserInfo = this.loadUserInfo.bind(this);
         this.state = {
             isMount: false, // инициализировано
             isStart: false, // получены первые сообщения
@@ -28,7 +29,6 @@ class DialogContainer extends PureComponent {
             id: '',
             secondId: '',
             timerId: '',
-            isReadyToChat: false, // пользователь существует в базе и не забанил 
         };
     }
 
@@ -88,6 +88,23 @@ class DialogContainer extends PureComponent {
         });
     }
 
+    loadUserInfo(id) {
+        axios.post(`https://khodyr.ru/chatix/backend/`, {
+            request: "GET_USERS_INFO",
+            id: id,
+            hash: this.globalState[0].me.hash
+        })
+        .then(response=>{
+            if (this.globalState[0].conversation.last_visit === -1) {
+                if (response.data.error == 2) {
+                    this.setSelectChatItem(id, "Пользователь не найен", -1);
+                } else if (!response.data.error) {
+                    this.setSelectChatItem(response.data.id, response.data.first_name+" "+response.data.last_name, response.data.last_visit);
+                }
+            }
+        });
+    }
+
     componentDidMount() {
         const self = this;
         const { globalState, setUserOnline, watchOnlineStatus, setMessages } = this.props;
@@ -107,29 +124,13 @@ class DialogContainer extends PureComponent {
                 if (this.globalState[0].conversations["id"+id].unread_count > 0) { // отметить сообщения в чате как прочитанные
                     this.read(id);
                 }
-                this.setState({ isReadyToChat: true });
             } else if (location.hash.length > 1 && !globalState[0].conversations["id"+location.hash.slice(1)]) {
-                this.setSelectChatItem(location.hash.slice(1), "Загрузка...", "...");
-                this.setState({ isReadyToChat: false });
+                this.setSelectChatItem(location.hash.slice(1), "Загрузка...", -1);
                 if (this.state.timerId) {
                     clearTimeout(this.state.timerId);
                 }
                 this.setState({ timerId: setTimeout(() => {
-                    axios.post(`https://khodyr.ru/chatix/backend/`, {
-                        request: "GET_USERS_INFO",
-                        id: location.hash.slice(1),
-                        hash: this.globalState[0].me.hash
-                    })
-                    .then(response=>{
-                        if (globalState[0].conversation.title === "Загрузка...") {
-                            if (response.data.error == 2) {
-                                this.setSelectChatItem(location.hash.slice(1), "Пользователь не найен", "...");
-                            } else if (!response.data.error) {
-                                this.setSelectChatItem(response.data.id, response.data.first_name+" "+response.data.last_name, response.data.last_visit);
-                                this.setState({ isReadyToChat: true });
-                            }
-                        }
-                    });
+                    this.loadUserInfo(location.hash.slice(1));
                 }, 1000) });
                 
             }
@@ -164,11 +165,16 @@ class DialogContainer extends PureComponent {
                 this.setState({ secondId: this.state.id });
             } else if (this.state.isMount && !this.state.isStart && this.props.globalState[0].conversations['id'+ this.state.id ] && this.props.globalState[0].conversations['id'+ this.state.id ].messages.length > 5) {
                 this.refs.scrollbars.scrollToBottom();
-                this.setState({ secondId: this.state.id, isStart : true, isReadyToChat : this.props.globalState[0].conversations['id'+ this.globalState[0].conversation.id] ? true : false });
+                this.setState({ secondId: this.state.id, isStart : true });
+            } else if (this.state.isMount && !this.state.isStart && !this.props.globalState[0].conversations['id'+ this.state.id ]) {
+                setTimeout(() => {
+                    this.loadUserInfo(this.state.id);
+                }, 500);
+                this.setState({ secondId: this.state.id, isStart : true });
             }
             if (this.state.isSend) {
                 this.refs.scrollbars.scrollToBottom();
-                this.setState({ isSend: false, isReadyToChat : this.props.globalState[0].conversations['id'+ this.globalState[0].conversation.id] ? true : false });
+                this.setState({ isSend: false });
             }
         }
     }
@@ -223,7 +229,7 @@ class DialogContainer extends PureComponent {
                     </div>
                 </Scrollbars>
                 {
-                    this.state.isReadyToChat ? <TextAreaMessage globalState={this.globalState} setMessages={this.props.setMessages} watchOnlineStatus={this.watchOnlineStatus} setUserOnline={this.setUserOnline} ownerClass={this} /> : null
+                    this.globalState[0].conversation.last_visit != -1 ? <TextAreaMessage globalState={this.globalState} setMessages={this.props.setMessages} watchOnlineStatus={this.watchOnlineStatus} setUserOnline={this.setUserOnline} ownerClass={this} /> : null
                 }
             </div>
         } else {
