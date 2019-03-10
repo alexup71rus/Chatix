@@ -170,7 +170,6 @@ class DialogContainer extends PureComponent {
                 setTimeout(() => {
                     this.loadUserInfo(this.state.id);
                 }, 500);
-                this.setState({ secondId: this.state.id, isStart : true });
             }
             if (this.state.isSend) {
                 this.refs.scrollbars.scrollToBottom();
