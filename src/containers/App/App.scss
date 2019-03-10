@@ -25,11 +25,11 @@ li {
 }
 
 .chat-show {
-    animation: chat-show .4s normal forwards ease-in-out;
+    animation: chat-show .3s normal forwards ease-in-out;
 }
 
 .chat-hide {
-    animation: chat-hide .3s normal forwards ease-in-out;
+    animation: chat-hide .25s normal forwards ease-in-out;
 }
 
 @keyframes chat-hide {

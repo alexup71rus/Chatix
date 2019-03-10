@@ -28,7 +28,7 @@ class ConversationPanel extends PureComponent {
         if (globalState[0].conversations_search.slice(0,1) !== "#") {
             conversations = Object.keys(conversations).filter(id => conversations[id].title.includes(globalState[0].conversations_search));
         } else {
-            conversations = Object.keys(conversations)
+            conversations = Object.keys(conversations);
         }
         return <nav>
             <SidebarSearch conversations={conversations} conversationsSearch={conversationsSearch} routeLocation={routeLocation} />
@@ -40,7 +40,7 @@ class ConversationPanel extends PureComponent {
                     isSelected={ this.props.globalState[0].conversation.id == id.slice(2) ? true : false } />
                 ))}
             </Scrollbars>
-            <div className="sidebar-left_navbar-panel" title="Information about me">
+            <div className="sidebar-left_navbar-panel" title="Мой профиль">
                 <li>
                     <img className="sidebar-left_navbar-panel__avatar" src="https://vk.com/images/camera_200.png?ava=1" alt="avatar"/>
                     <span className="sidebar-left_navbar-panel__nickname" title={`id${this.props.globalState[0].me.id}`}>{`${this.props.globalState[0].me.info.first_name} ${this.props.globalState[0].me.info.last_name}`}</span>

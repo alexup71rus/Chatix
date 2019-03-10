@@ -13,7 +13,7 @@ const reducers = (state = [], action) => {
             };
             return [...newState];
 
-        case 'REMOVE_CONVERSATIONS': // удалить отображение диалогов
+        case 'REMOVE_CONVERSATIONS': // удалить отображение диалога
             if (action.id && newState[0].conversations["id"+action.id]) {
                 delete newState[0].conversations["id"+action.id];
             }

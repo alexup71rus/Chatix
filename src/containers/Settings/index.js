@@ -21,12 +21,12 @@ class SettingsPage extends PureComponent {
     }
 
     render() {
-        const modalClass = this.globalState[0].modal == "settings"
+        const modalClass = this.globalState[0].modal === "settings"
             ? "fullscreen-show"
             : this.isAnimationReady === true
                 ? "fullscreen-hide"
                 : "fullscreen-hide-non-animation";
-        // this.isAnimationReady = true;
+        this.isAnimationReady = this.isAnimationReady === false && modalClass === "fullscreen-hide-non-animation" ? false : true;
         return <div className={`settings ${modalClass}`}>
             <div className="settings_sidebar-left">
                 <button onClick={()=>this.props.modal("")} className="settings_sidebar_button-back">Назад</button>

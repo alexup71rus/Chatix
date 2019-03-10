@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { DialogSearch } from '../components/search';
 
 export const HeaderDialogContainer = ({ globalState }) => {

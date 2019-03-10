@@ -7,7 +7,7 @@ import { WatchOnlineStatus } from '../../components/tracker';
 import SettingsPage from '../Settings/';
 import SideBarLeft from '../SideBarLeft/';
 import SideBarRight from '../SideBarRight/';
-import { setSelectChatItem, setConversations, setUserOnline, setMessages, modal } from '../../actions';
+import { setSelectChatItem, setConversations, setUserOnline, setMessages, markAsRead, modal } from '../../actions';
 
 class App extends React.Component {
   constructor(props) {
@@ -17,7 +17,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const { globalState, setSelectChatItem, setUserOnline, setConversations, setMessages } = this.props;
+    const { globalState, setSelectChatItem, setUserOnline, setConversations, setMessages, markAsRead } = this.props;
     const watchOnlineStatus = this.watchOnlineStatus;
     window.cometApi.onAuthSuccess(function(){
       if (globalState[0].me.hash) {
@@ -41,22 +41,31 @@ class App extends React.Component {
               setSelectChatItem(id);
               axios.post(`https://khodyr.ru/chatix/backend/`, { // получает все сообщения в открытом чате
                 request: "GET_MESSAGES",
-                id: location.slice(1),
+                id: id,
                 hash: token,
                 fetch: fetch,
               })
               .then(response=>{
+                console.log(response);
                 if (!response.data.length) { // если старых сообщений больше нет и нет уже добавленного значка о том, что больше нечего грузить, то выводить этот значок
                   setMessages({
                     type: "separator_no-messages",
-                    id: location.slice(1),
+                    id: id,
                   });
                 } else if (response.data.length) {
                   setMessages({
                     type: "lazy_load",
                     event: response,
-                    id: location.slice(1),
+                    id: id,
                   });
+                  if (globalState[0].conversations["id"+id].unread_count > 0) {
+                    markAsRead(id);
+                    axios.post(`https://khodyr.ru/chatix/backend/`, {
+                      request: "MARK_AS_READ",
+                      id: id,
+                      hash: globalState[0].me.hash,
+                      });
+                  }
                 }
               });
             }
@@ -122,6 +131,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     modal: (typeModal) => dispatch(modal(typeModal)),
+    markAsRead: (id, errUC, errUT) => dispatch(markAsRead(id, errUC, errUT)),
     setSelectChatItem: (id) => dispatch(setSelectChatItem(id)),
     setConversations: (response) => dispatch(setConversations(response)),
     setUserOnline: (response) => dispatch(setUserOnline(response)),
