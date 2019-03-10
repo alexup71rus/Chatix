@@ -97,7 +97,7 @@ class DialogContainer extends PureComponent {
         .then(response=>{
             if (this.globalState[0].conversation.last_visit === -1) {
                 if (response.data.error == 2) {
-                    this.setSelectChatItem(id, "Пользователь не найен", -1);
+                    this.setSelectChatItem(id, "Пользователь не найден", -1);
                 } else if (!response.data.error) {
                     this.setSelectChatItem(response.data.id, response.data.first_name+" "+response.data.last_name, response.data.last_visit);
                 }

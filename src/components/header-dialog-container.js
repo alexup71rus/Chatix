@@ -28,10 +28,10 @@ export const HeaderDialogContainer = ({ globalState }) => {
             <b className="dialog-header_left-container__title-dialog">
             {
                 convInfo
-                    ? convInfo.title.length > 20
-                        ? convInfo.title.slice(0, 16) + "..."
+                    ? convInfo.title.length > 23
+                        ? convInfo.title.slice(0, 20) + "..."
                         : convInfo.title
-                    : "Заголовок"
+                    : "Загрузка..."
             }
             </b>
             <b className="dialog-header_left-container__id-dialog">
@@ -52,7 +52,7 @@ export const HeaderDialogContainer = ({ globalState }) => {
                         : +convInfo.last_visit >= Math.floor(Date.now() / 1000) - 120
                             ? "Был(а) в сети пару минут назад"
                             : +convInfo.last_visit === -1
-                                ? `Не в сети`
+                                ? ``
                                 : `Был(а) в сети ${new Date((+convInfo.last_visit) * 1000).toLocaleString().slice(0, -3)}`
                 : "..."
             }
