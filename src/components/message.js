@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Linkify from 'react-linkify';
 import { emojify } from 'react-emojione';
 
 export const Separator = () => {
@@ -21,7 +22,6 @@ export const Message = ({ obj }) => {
     const readstate = obj.readstate;
     const unread = readstate ? 'message-item_unread' : '';
     const unixtime = new Date(date * 1000).toLocaleString();
-
     return <div className={"message-item " + unread}>
         <img className="message-item_avatar" src="https://vk.com/images/camera_200.png?ava=1" alt=""/>
         <span className="message-item_online"></span>
@@ -31,9 +31,11 @@ export const Message = ({ obj }) => {
                 <time className="message-item_time-message" title={unixtime}>{unixtime}</time>
             </div>
             <br/>
-            <div className="message-item_message">
-                <pre className="message_text__pretty-message">{emojify(text, { useEmoticon : true, emojiType: "emojione", convertAscii: true, convertUnicode: true, convertShortnames: true, style:{height: 22, } }) }</pre>
-            </div>
+            <Linkify className="message-item_message">
+                <pre className="message_text__pretty-message">
+                    <Linkify>{emojify(text, { useEmoticon : true, emojiType: "emojione", convertAscii: true, convertUnicode: true, convertShortnames: true, style:{height: 22, } }) }</Linkify>
+                </pre>
+            </Linkify>
         </div>
     </div>;
 }

@@ -10,6 +10,7 @@ class TextAreaMessage extends Component {
         super(props);
         this.state = {
             emojibar: false,
+            attachTypebar: false,
             key: false,
             enterKey: false,
             shiftKey: false,
@@ -100,7 +101,7 @@ class TextAreaMessage extends Component {
         >
             <Scrollbars
             className="message-container_scrollbar-textarea"
-            style={{ height: "60px", width: "94%" }}
+            style={{ height: "60px", width: "90%" }}
             autoHide ref="scrollbars"
             onScroll={this.updateScroll}
             onClick={ev=>{
@@ -135,13 +136,38 @@ class TextAreaMessage extends Component {
                 />
             </Scrollbars>
             
-            <div className="textarea-container_items">
+            <div className="textarea-container_smile">
                 {
                     this.state.emojibar ? <EmojiPicker onEmojiClick={this.addEmoji} disableDiversityPicker /> : null
                 }
-                <button className="textarea-container_item__smile" onClick={ev=>{
-                    this.setState({emojibar: !this.state.emojibar});
+                <button className="textarea-container_item__smile" onClick={ev=>{                    
+                    this.setState({ emojibar: !this.state.emojibar });
                 }}><i className="fas fa-grin textarea-container_item__smile-icon"></i></button>
+            </div>
+            <div className="textarea-container_attach">
+                {
+                    this.state.attachTypebar ? <div className="select-attach-type-bar">
+                    <button className="select-attach-type-bar_button" onClick={ev=>{
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('GET', 'https://www.linux.org.ru/forum/web-development/13408768', true);
+                        xhr.onload = function(){
+                            console.log(this.response);
+                        }
+                        xhr.send();
+
+                        // axios.get("https://www.linux.org.ru/forum/web-development/13408768")
+                        // .then(res=>{
+                        //     console.log(res);
+                        // });
+                    }}>Файл</button>
+                    <button className="select-attach-type-bar_button" onClick={ev=>{
+                        this.setState({ emojibar: !this.state.emojibar });
+                    }}>Изображение</button>
+                    </div> : null
+                }
+                <button className="textarea-container_item__attach" onClick={ev=>{
+                    this.setState({attachTypebar: !this.state.attachTypebar});
+                }}><i className="fas fa-paperclip textarea-container_item__attach-icon"></i></button>
             </div>
         </div>
     }
