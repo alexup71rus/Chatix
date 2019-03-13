@@ -178,31 +178,6 @@ time {
     font-size: 20px;
 }
 
-.textarea-container_attach {
-    position: absolute;
-    right: calc(50% - 450px);
-    width: 40px;
-}
-
-.textarea-container_item__attach {
-    width: 100%;
-    border-radius: 50%;
-    border: none;
-    background: transparent;
-    padding: 10px;
-    cursor: pointer;
-    opacity: .8;
-}
-
-.textarea-container_item__attach:hover {
-    opacity: 1;
-}
-
-.textarea-container_item__attach-icon {
-    color: #fff;
-    font-size: 20px;
-}
-
 .select-attach-type-bar {
     position: fixed;
     left: calc(50% + 340px);
@@ -213,25 +188,6 @@ time {
     box-shadow: 0 1px 3px #000;
     width: 100px;
     height: 56px;
-}
-
-.select-attach-type-bar_button {
-    text-align: left;
-    width: 100%;
-    left: calc(50% + 340px);
-    top: calc(100vh - 220px);
-    padding: 5px;
-    background: #fff;
-    border-radius: 3px;
-    border: none;
-}
-
-.select-attach-type-bar_button:hover {
-    background: #eee;
-}
-
-.select-attach-type-bar_button:focus {
-    
 }
 
 .message-item_message {
