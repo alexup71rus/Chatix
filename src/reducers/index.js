@@ -166,6 +166,10 @@ const reducers = (state = [], action) => {
 
             return [...newState];
 
+        case 'MESSAGES_SEARCH': // текст поля поиска
+            newState[0].messages_search = action.text;
+            return [...newState];
+
         case 'CONVERSATIONS_SEARCH': // текст поля поиска
             newState[0].conversations_search = action.text;
             return [...newState];

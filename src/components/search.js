@@ -25,15 +25,12 @@ export const SidebarSearch = ({ conversations, conversationsSearch, routeLocatio
     </div>;
 }
 
-export const DialogSearch = (props) => {
-    const { conversations, conversationsSearch } = props;
+export const DialogSearch = ({ conversations, messagesSearch }) => {
     return <div className="dialog-search">
     <input
     className="dialog-search_input"
     placeholder="Поиск по чату"
-    onChange={ev=>{
-        
-    }} />
+    onKeyUp={ev=>messagesSearch(ev.target.value)} />
         <i className="fas dialog-search_icon fa-search"></i>
     </div>;
 }

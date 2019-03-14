@@ -1,7 +1,7 @@
 import React from 'react';
 import { DialogSearch } from '../components/search';
 
-export const HeaderDialogContainer = ({ globalState }) => {
+export const HeaderDialogContainer = ({ globalState, messagesSearch }) => {
     const convId = globalState[0].conversation.id;
     let convInfo = null;
     if (globalState[0].conversations && globalState[0].conversations[`id${convId}`]) {
@@ -59,7 +59,7 @@ export const HeaderDialogContainer = ({ globalState }) => {
             </span>
         </span>
         <span className="dialog-header_right-container">
-            <DialogSearch />
+            <DialogSearch messagesSearch={messagesSearch} />
         </span>
     </div>;
 }

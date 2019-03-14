@@ -5,7 +5,7 @@ import { HeaderDialogContainer } from '../../../components/header-dialog-contain
 import { Scrollbars } from 'react-custom-scrollbars'; // Кастомный скролл
 import axios from 'axios-jsonp-pro';
 import TextAreaMessage from '../../../components/textarea';
-import { markAsRead, setMyProfileInfo, setConversations, setSelectChatItem, setUserOnline, setMessages } from '../../../actions';
+import { markAsRead, setMyProfileInfo, setConversations, setSelectChatItem, setUserOnline, setMessages, messagesSearch } from '../../../actions';
 import './index.scss';
 
 class DialogContainer extends PureComponent {
@@ -22,12 +22,15 @@ class DialogContainer extends PureComponent {
         this.handleScrollBottom = this.handleScrollBottom.bind(this);
         this.read = this.read.bind(this);
         this.loadUserInfo = this.loadUserInfo.bind(this);
+        this.loadSearchMessages = this.loadSearchMessages.bind(this);
         this.state = {
             isMount: false, // инициализировано
             isStart: false, // получены первые сообщения
             isSend: false, // было отправлено сообщение от моего имени
             id: '',
             secondId: '',
+            secondTextSearchMessages: '',
+            foundMessages: [],
             timerId: '',
         };
     }
@@ -105,17 +108,27 @@ class DialogContainer extends PureComponent {
         });
     }
 
+    loadSearchMessages (id, text) {
+        console.log(text);
+        axios.post(`https://khodyr.ru/chatix/backend/`, {
+            request: "FIND_MESSAGES",
+            id: id,
+            text: text
+        })
+        .then(response=>{
+            console.log(response);
+        });
+    }
+
     componentDidMount() {
         const self = this;
         const { globalState, setUserOnline, watchOnlineStatus, setMessages } = this.props;
-        if(this.loc.location.hash) {
-            this.setState({ isMount: true, id: this.loc.location.hash.slice(1) });
-            this.setSelectChatItem(this.loc.location.hash.slice(1));
-        }
         this.unlisten = this.loc.history.listen((location, action) => { // слушаю измнение id в адресной строке
             const id = location.hash ? location.hash.slice(1) : "";
             if(id && this.globalState[0].conversations["id"+id]) {
-                this.setSelectChatItem(id);
+                if(location.hash != this.state.id) {
+                    this.setSelectChatItem(id);
+                }
                 if (this.globalState[0].conversations["id"+id].messages.length <= 1 && location.hash != this.state.id) {
                     this.getMessages(id, this.globalState[0].me.hash, this.globalState[0].conversations["id"+id].messages.length, 20, true); // Получаю все сообщения при открытии диалога
                 } else if (this.refs.scrollbars) {
@@ -124,7 +137,7 @@ class DialogContainer extends PureComponent {
                 if (this.globalState[0].conversations["id"+id].unread_count > 0) { // отметить сообщения в чате как прочитанные
                     this.read(id);
                 }
-            } else if (location.hash.length > 1 && !globalState[0].conversations["id"+location.hash.slice(1)]) {
+            } else if (location.hash.length > 1 && !globalState[0].conversations["id"+location.hash.slice(1)] && location.hash != this.state.id) {
                 this.setSelectChatItem(location.hash.slice(1), "Загрузка...", -1);
                 if (this.state.timerId) {
                     clearTimeout(this.state.timerId);
@@ -140,6 +153,10 @@ class DialogContainer extends PureComponent {
                 this.setState({ id: null });
             }
         });
+        if(this.loc.location.hash) {
+            this.setState({ isMount: true, id: this.loc.location.hash.slice(1) });
+            this.setSelectChatItem(this.loc.location.hash.slice(1));
+        }
         window.CometServer().subscription("msg.private_user_message", function(event){ // слушаю личные сообщения
             if(globalState[0].conversations['id'+event.data.from_id] && event.data.from_id == self.state.id) {
                 setMessages({ type: "push", event: event });
@@ -157,18 +174,29 @@ class DialogContainer extends PureComponent {
     }
     
     componentDidUpdate() {
-        if (!this.state.secondId && this.state.id) {
-            this.setState({ secondId: this.state.id });
+        const id = this.state.id;
+        const loadSearchMessages = this.loadSearchMessages;
+        const textSearchMessages = this.props.globalState[0].messages_search;
+        if(textSearchMessages.length > 1 && this.props.globalState[0].conversations['id'+ id ] && this.props.globalState[0].messages_search != this.state.secondTextSearchMessages) {
+            if (this.state.timerId) {
+                clearTimeout(this.state.timerId);
+            }
+            this.setState({ secondTextSearchMessages: this.props.globalState[0].messages_search, timerId: setTimeout(() => {
+                loadSearchMessages(id, textSearchMessages);
+            }, 1000) });
+        }
+        if (!this.state.secondId && id) {
+            this.setState({ secondId: id });
         } else if (this.state.secondId) {
-            if(this.state.secondId != this.state.id) {
+            if(this.state.secondId != id) {
                 this.refs.scrollbars.scrollToBottom();
-                this.setState({ secondId: this.state.id });
-            } else if (this.state.isMount && !this.state.isStart && this.props.globalState[0].conversations['id'+ this.state.id ] && this.props.globalState[0].conversations['id'+ this.state.id ].messages.length > 5) {
+                this.setState({ secondId: id });
+            } else if (this.state.isMount && !this.state.isStart && this.props.globalState[0].conversations['id'+ id ] && this.props.globalState[0].conversations['id'+ id ].messages.length > 5) {
                 this.refs.scrollbars.scrollToBottom();
-                this.setState({ secondId: this.state.id, isStart : true });
-            } else if (this.state.isMount && !this.state.isStart && !this.props.globalState[0].conversations['id'+ this.state.id ]) {
+                this.setState({ secondId: id, isStart : true });
+            } else if (this.state.isMount && !this.state.isStart && !this.props.globalState[0].conversations['id'+ id ]) {
                 setTimeout(() => {
-                    this.loadUserInfo(this.state.id);
+                    this.loadUserInfo(id);
                 }, 500);
             }
             if (this.state.isSend) {
@@ -204,6 +232,7 @@ class DialogContainer extends PureComponent {
             return <div className="dialog-left">
                 <HeaderDialogContainer
                     globalState={this.props.globalState}
+                    messagesSearch={this.props.messagesSearch}
                 />
                 <Scrollbars
                     style={{height: "calc(100vh - 180px)" }}
@@ -213,7 +242,17 @@ class DialogContainer extends PureComponent {
                     >
                     <div className="dialog-left_container" id="dialog-left_container">
                     {
-                        conversations
+                        this.state.foundMessages.length
+                        ? this.state.foundMessages.map(obj => {
+                                if (obj.type == "load_message" || obj.type == "push_message") {
+                                    return <Message key={obj.id} obj={obj} />
+                                } else if (obj.type == "first_load_message") {
+                                    return <div key={obj.id}><Message obj={obj} /><Separator /></div>
+                                } else if (obj.type == "separator_no-messages") {
+                                    return <SeparatorNoMessages key={obj.type} name={conversations.title} />
+                                }
+                            })
+                        : conversations
                         ? conversations.messages.map(obj => {
                                 if (obj.type == "load_message" || obj.type == "push_message") {
                                     return <Message key={obj.id} obj={obj} />
@@ -253,6 +292,7 @@ const mapDispatchToProps = (dispatch) => {
       setUserOnline: (response) => dispatch(setUserOnline(response)),
       setMessages: (response) => dispatch(setMessages(response)),
       setConversations: (res) => dispatch(setConversations(res)),
+      messagesSearch: (text) => dispatch(messagesSearch(text)),
     }
 }
   
