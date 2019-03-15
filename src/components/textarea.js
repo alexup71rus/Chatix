@@ -5,6 +5,8 @@ import { Scrollbars } from 'react-custom-scrollbars'; // Кастомный ск
 import axios from 'axios-jsonp-pro';
 import EmojiPicker from 'emoji-picker-react';
 
+import emptyImage from '../img/empty-image.png';
+
 class TextAreaMessage extends Component {
     constructor(props) {
         super(props);
@@ -105,7 +107,7 @@ class TextAreaMessage extends Component {
             autoHide ref="scrollbars"
             onScroll={this.updateScroll}
             onClick={ev=>{
-                if (this.state.emojibar) this.setState({emojibar: false});
+                if (this.state.emojibar || this.state.attachTypebar) this.setState({ emojibar: false, attachTypebar: false });
             }}
             >
                 <Textarea
@@ -141,8 +143,41 @@ class TextAreaMessage extends Component {
                     this.state.emojibar ? <EmojiPicker onEmojiClick={this.addEmoji} disableDiversityPicker /> : null
                 }
                 <button className="textarea-container_item__smile" onClick={ev=>{                    
-                    this.setState({ emojibar: !this.state.emojibar });
+                    this.setState({ emojibar: !this.state.emojibar, attachTypebar: false });
+                    this.textarea.focus();
                 }}><i className="fas fa-grin textarea-container_item__smile-icon"></i></button>
+            </div>
+            <div className="textarea-container_attach">
+                {
+                    this.state.attachTypebar
+                    ? <div className="select-attach-type-bar">
+                            <input
+                                type="url"
+                                name=""
+                                id=""
+                                placeholder="https://"
+                                className="select-attach_input-href"
+                                onKeyUp={ev=>{
+                                    // axios.get("https://www.linux.org.ru/forum/web-development/13408768")
+                                    // .then(res=>{
+                                    //     console.log(res);
+                                    // });
+                                }}
+                            />
+                            <div className="select-attach_attach-preview">
+                                <div className="select-attach_title">Title is empty</div>
+                                <img
+                                    src={emptyImage}
+                                    alt=""
+                                    className="select-attach_img"
+                                />
+                            </div>
+                        </div>
+                    : null
+                }
+                <button className="textarea-container_item__attach" onClick={ev=>{
+                    this.setState({ emojibar: false, attachTypebar: !this.state.attachTypebar });
+                }}><i className="fas fa-paperclip textarea-container_item__attach-icon"></i></button>
             </div>
         </div>
     }

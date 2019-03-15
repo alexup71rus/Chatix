@@ -79,7 +79,7 @@ function conversationList ($hash) { global $db;  // получение конт�
     }
 }
 
-function getMessages ($id, $hash, $fetch_start, $fetch_end) { global $db;
+function getMessages ($id, $hash, $fetch_start, $fetch_end) { global $db; // получить все сообщения диалога между двумя пользователями
     if ($info_result = findMeForHash($db, $hash)) {
         $fetch_end = $fetch_end ? $fetch_end : 20;  // выборка
         $messages_result = mysqli_query($db, "SELECT `message` FROM messages WHERE (from_user_id = ".$info_result['id']." and to_user_id = ".$id.") or (to_user_id = ".$info_result['id']." and from_user_id = ".$id.") order by time desc limit $fetch_start, $fetch_end " );
@@ -95,6 +95,21 @@ function getMessages ($id, $hash, $fetch_start, $fetch_end) { global $db;
 
 function sendMessage () { global $db;
     
+}
+
+function findMessages ($id, $text, $hash) { global $db; // найти сообщения в диалоге между двумя пользователями
+    if ($info_result = findMeForHash($db, $hash)) {
+        $text = addslashes(substr(json_encode($text), 1, -1));
+        $text = addslashes($text);
+        $messages_result = mysqli_query($db, "SELECT * FROM `messages` WHERE (from_user_id = ".$info_result['id']." and to_user_id = ".$id." and `message` LIKE '%$text%') or (to_user_id = ".$info_result['id']." and from_user_id = ".$id." and `message` LIKE '%$text%') order by time desc limit 10 ");
+        $response = [];
+        while( $result = mysqli_fetch_assoc($messages_result) ){
+            $response[] = json_decode($result['message'], TRUE);
+        }
+        return $response;
+    } else {
+        return [ error => 1, message => "Invalid `hash`" ];
+    }
 }
 
 function markAsRead ($id, $hash) { global $db;

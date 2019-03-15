@@ -20,7 +20,7 @@ $_POST['mail'] = formatstr($_POST['mail']);
 $_POST['login'] = formatstr($_POST['login']);
 $_POST['pass'] = formatstr($_POST['pass']);
 $_POST['hash'] = formatstr($_POST['hash']);
-$_POST['text'] = formatstr($_POST['text']);
+// $_POST['text'] = formatstr($_POST['text']);
 $_POST['attach'] = formatstr($_POST['attach']);
 $_POST['forward'] = formatstr($_POST['forward']);
 $_POST['date'] = formatstr($_POST['date']);
@@ -77,7 +77,7 @@ switch ($_POST['request']) {
             echo json_encode([ error => 0, message => [
                 id => $response['message'],
                 hash => $hash
-            ] ], JSON_UNESCAPED_UNICODE);
+            ] ]);
         }
     break;
 
@@ -103,7 +103,7 @@ switch ($_POST['request']) {
             break;
         }
         $response = checkOnlineStatus($_db, $_POST['data']);
-        echo json_encode($response, JSON_UNESCAPED_UNICODE);
+        echo json_encode($response);
     break;
 
     case "CHECK_ONLINE_STATUS_ID":  // получить время последнего захода на сайт конкретного пользователя
@@ -112,7 +112,7 @@ switch ($_POST['request']) {
             break;
         }
         $response = checkOnlineStatusId($_db, $_POST['id']);
-        echo json_encode($response, JSON_UNESCAPED_UNICODE);
+        echo json_encode($response);
     break;
 
     case "GET_USERS_INFO": // получить информацию о пользователях по id
@@ -121,7 +121,7 @@ switch ($_POST['request']) {
             break;
         }
         $response = getUserInfo($_db, $_POST['id']);
-        echo json_encode($response, JSON_UNESCAPED_UNICODE);
+        echo json_encode($response);
     break;
     
     case "COUNT_NEW_MESSAGES_SUM": // количество непрочитанных сообщений
@@ -138,7 +138,7 @@ switch ($_POST['request']) {
             break;
         }
         $response = conversationList($_POST['hash']);
-        echo json_encode($response, JSON_UNESCAPED_UNICODE);
+        echo json_encode($response);
     break;
     
     case "GET_MESSAGES": // получить сообщения по id
@@ -155,7 +155,7 @@ switch ($_POST['request']) {
             break;
         }
         $response = getMessages($_POST['id'], $_POST['hash'], $_POST['fetch'], $_POST['fetch_end']);
-        echo json_encode($response, JSON_UNESCAPED_UNICODE);
+        echo json_encode($response);
     break;
 
     case "SEND_PRIVATE_MESSAGE": // отправить личное сообщение пользователю
@@ -215,9 +215,9 @@ switch ($_POST['request']) {
                 read_state=>0,
             ],
         ];
-        $response = json_encode($response, JSON_UNESCAPED_UNICODE);
+        $response = addslashes(json_encode($response));
         if (!$isMe) {
-            mysqli_query (  $_db, "INSERT INTO users_messages (id, event, message)VALUES (".$_POST['id'].", 'private_user_message', '$response');" );
+            mysqli_query (  $_db, "INSERT INTO users_messages (id, event, message) VALUES (".$_POST['id'].", 'private_user_message', '$response');" );
         }
         $userAgent = "";
         if(isset($_SERVER['HTTP_USER_AGENT'])) { $userAgent = mysqli_real_escape_string($db, $_SERVER['HTTP_USER_AGENT']); }
@@ -250,6 +250,23 @@ switch ($_POST['request']) {
             break;
         }
         $response = markAsRead($_POST['id'], $_POST['hash']);
+        echo json_encode($response);
+    break;
+
+    case "FIND_MESSAGES": // найти сообщения к диалоге
+        if (strlen($_POST['hash']) < 1) {
+            echo json_encode([ error => 3, message => "invalid `hash` param" ]);
+            break;
+        }
+        if (strlen($_POST['id']) < 1) {
+            echo json_encode([ error => 3, message => "invalid `id` param" ]);
+            break;
+        }
+        if (strlen($_POST['text']) < 1) {
+            echo json_encode([ error => 3, message => "invalid `id` param" ]);
+            break;
+        }
+        $response = findMessages($_POST['id'], $_POST['text'], $_POST['hash']);
         echo json_encode($response);
     break;
 

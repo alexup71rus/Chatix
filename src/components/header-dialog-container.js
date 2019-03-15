@@ -50,7 +50,7 @@ export const HeaderDialogContainer = ({ globalState, messagesSearch }) => {
                     ? +convInfo.last_visit == 0
                         ? "Сейчас в сети"
                         : +convInfo.last_visit >= Math.floor(Date.now() / 1000) - 120
-                            ? "Был(а) в сети пару минут назад"
+                            ? "Был(а) в сети только что"
                             : +convInfo.last_visit === -1
                                 ? ``
                                 : `Был(а) в сети ${new Date((+convInfo.last_visit) * 1000).toLocaleString().slice(0, -3)}`

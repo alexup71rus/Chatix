@@ -156,12 +156,15 @@ const reducers = (state = [], action) => {
             result.conversations['id'+newState[0].me.id] = {
                 id: newState[0].me.id, title: "Избранное", last_visit: 0, unread_time: 0, unread_count: 0, messages: []
             }
-            Object.keys(newState[0].conversations).sort(function (a, b) {
-                const lenA = newState[0].conversations[a].messages.length - 1;
-                const lenB = newState[0].conversations[b].messages.length - 1;
-                return newState[0].conversations[b].messages[lenB].id - newState[0].conversations[a].messages[lenA].id;
-            }).forEach(function (v) { result.conversations[v] = newState[0].conversations[v]; });
-
+            if (Object.keys(newState[0].conversations).length) {
+                Object.keys(newState[0].conversations).sort(function (a, b) {
+                    const lenA = newState[0].conversations[a].messages.length - 1;
+                    const lenB = newState[0].conversations[b].messages.length - 1;
+                    if (lenB > -1 && lenA > -1) {
+                        return newState[0].conversations[b].messages[lenB].id - newState[0].conversations[a].messages[lenA].id;
+                    }
+                }).forEach(function (v) { result.conversations[v] = newState[0].conversations[v]; });
+            }
             newState[0].conversations = result.conversations;
 
             return [...newState];

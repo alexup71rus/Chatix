@@ -29,6 +29,7 @@ class DialogContainer extends PureComponent {
             isSend: false, // было отправлено сообщение от моего имени
             id: '',
             secondId: '',
+            isFind: false,
             secondTextSearchMessages: '',
             foundMessages: [],
             timerId: '',
@@ -86,7 +87,6 @@ class DialogContainer extends PureComponent {
         .then(response=>{
             if (response.data.error != 0) {
                 markAsRead(id, oldUnreadCount, oldReadTime);
-                console.error(response.data.message);
             }
         });
     }
@@ -108,16 +108,20 @@ class DialogContainer extends PureComponent {
         });
     }
 
-    loadSearchMessages (id, text) {
-        console.log(text);
-        axios.post(`https://khodyr.ru/chatix/backend/`, {
-            request: "FIND_MESSAGES",
-            id: id,
-            text: text
-        })
-        .then(response=>{
-            console.log(response);
-        });
+    loadSearchMessages (id, text, hash) {
+        if (id && text && hash) {
+            axios.post(`https://khodyr.ru/chatix/backend/`, {
+                request: "FIND_MESSAGES",
+                id: id,
+                text: text,
+                hash: hash
+            })
+            .then(response=>{
+                if (response.data) {
+                    this.setState({ foundMessages: response.data, isFind: true });
+                }
+            });
+        }
     }
 
     componentDidMount() {
@@ -148,9 +152,9 @@ class DialogContainer extends PureComponent {
                 
             }
             if(location.hash) {
-                this.setState({ id: location.hash.slice(1) });
+                this.setState({ id: location.hash.slice(1), foundMessages: [], secondTextSearchMessages: "" });
             } else {
-                this.setState({ id: null });
+                this.setState({ id: null, foundMessages: [], secondTextSearchMessages: "" });
             }
         });
         if(this.loc.location.hash) {
@@ -182,9 +186,16 @@ class DialogContainer extends PureComponent {
                 clearTimeout(this.state.timerId);
             }
             this.setState({ secondTextSearchMessages: this.props.globalState[0].messages_search, timerId: setTimeout(() => {
-                loadSearchMessages(id, textSearchMessages);
-            }, 1000) });
+                loadSearchMessages(id, textSearchMessages, this.globalState[0].me.hash);
+            }, 500) });
+        } else if (textSearchMessages.length === 0 && this.state.secondTextSearchMessages && this.props.globalState[0].conversations['id'+ id ] && this.props.globalState[0].messages_search != this.state.secondTextSearchMessages) {
+            this.setState({ foundMessages: [], secondTextSearchMessages: "" });
+        } else if (this.props.globalState[0].messages_search === "" && this.props.globalState[0].messages_search == this.state.secondTextSearchMessages && this.state.isFind === true) {
+            this.setState({ isFind: false });
+        } else if (this.state.isFind === false && this.refs.top === 1) {
+            this.refs.scrollbars.scrollToBottom();
         }
+        
         if (!this.state.secondId && id) {
             this.setState({ secondId: id });
         } else if (this.state.secondId) {
@@ -210,7 +221,8 @@ class DialogContainer extends PureComponent {
         if (ev.top == 0) {
             if (this.state.id, this.globalState[0].me.hash, this.globalState[0].conversations["id"+this.state.id]
             && this.globalState[0].conversations["id"+this.state.id].messages.length > 2
-            && this.globalState[0].conversations['id'+this.state.id].messages[0].type != "separator_no-messages") {
+            && this.globalState[0].conversations['id'+this.state.id].messages[0].type != "separator_no-messages"
+            && this.state.isFind === false) {
                 this.getMessages(this.state.id, this.globalState[0].me.hash, (this.globalState[0].conversations["id"+this.state.id].messages.length), 5 );  
             }
         } else {
@@ -242,15 +254,9 @@ class DialogContainer extends PureComponent {
                     >
                     <div className="dialog-left_container" id="dialog-left_container">
                     {
-                        this.state.foundMessages.length
+                        this.state.isFind
                         ? this.state.foundMessages.map(obj => {
-                                if (obj.type == "load_message" || obj.type == "push_message") {
-                                    return <Message key={obj.id} obj={obj} />
-                                } else if (obj.type == "first_load_message") {
-                                    return <div key={obj.id}><Message obj={obj} /><Separator /></div>
-                                } else if (obj.type == "separator_no-messages") {
-                                    return <SeparatorNoMessages key={obj.type} name={conversations.title} />
-                                }
+                                return <Message key={obj.id} obj={obj} />
                             })
                         : conversations
                         ? conversations.messages.map(obj => {
