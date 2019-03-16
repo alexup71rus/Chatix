@@ -182,14 +182,14 @@ time {
 
 .select-attach-type-bar {
     position: fixed;
-    left: calc(50% + 200px);
-    top: calc(100vh - 353px);
+    left: calc(50% + 215px);
+    bottom: calc(-100vh + 90px);
     padding: 5px;
     background: #fff;
     border-radius: 3px;
     box-shadow: 0 1px 3px #000;
     width: 220px;
-    height: 246px;
+    height: auto;
 }
 
 .select-attach_input-href {
@@ -215,7 +215,19 @@ time {
     width: 100%;
 }
 
+.select-attach_site {
+    color: #9983d8;
+    margin: 4px 0;
+    font-family: inherit;
+}
+
 .select-attach_title {
+    color: #000;
+    margin: 4px 0;
+    font-family: inherit;
+}
+
+.select-attach_description {
     color: #000;
     margin: 4px 0;
     font-family: inherit;

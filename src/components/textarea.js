@@ -165,7 +165,9 @@ class TextAreaMessage extends Component {
                                 }}
                             />
                             <div className="select-attach_attach-preview">
-                                <div className="select-attach_title">Title is empty</div>
+                                <div className="select-attach_site"><b>Сайт</b></div>
+                                <div className="select-attach_title"><b>Заголовок страницы</b></div>
+                                <div className="select-attach_description">Пустое описание</div>
                                 <img
                                     src={emptyImage}
                                     alt=""
